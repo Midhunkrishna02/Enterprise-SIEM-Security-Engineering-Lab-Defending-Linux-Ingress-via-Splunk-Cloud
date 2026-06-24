@@ -82,7 +82,7 @@ To transform raw Unix time integers (e.g., 1782278979.912) into actionable human
     | table Human_Time, Attacker_IP, Targeted_User
     | rename Human_Time as "Timestamp", Attacker_IP as "Attacker IP", Targeted_User as "Compromised Account"
 
-(Insert your Successful Breach Timeline screenshot here)
+[Successful Breach Forensic Timeline](images/successful_login.png)
 
 ---
 
@@ -109,7 +109,7 @@ During active automated intrusions, attackers generate thousands of unique text 
 
 To rigorously verify the rule's operational status, a secondary attack sequence was executed via Hydra. The scheduled alert executed successfully, tracking the data spike and generating an incident record inside the tracking console.
 
-(Insert your Triggered Alerts Dashboard screenshot here)
+[Splunk Triggered Alerts Console Dashboard](images/triggered_alert.png)
 
 ### 🛡️ Analytical Findings & Response Checklist
 1. Malicious Actor Identified: Ingress IP Attacker_IP tracked attempting high-velocity authentication.
