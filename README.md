@@ -1,5 +1,4 @@
-# Enterprise-SIEM-Security-Engineering-Lab-Defending-Linux-Ingress-via-Splunk-Cloud
-
+# Enterprise SIEM Security Engineering Lab: Defending Linux Ingress via Splunk Cloud
 
 ## 📌 Architectural Overview
 This defensive security engineering project implements an end-to-end telemetry pipeline and monitoring capability designed to capture, parse, and alert on automated password-spraying and authentication-driven brute force vectors. 
@@ -35,7 +34,7 @@ Following a daemon reload cycle, data synchronization with the Cloud SIEM engine
 
 Using a distinct network adapter point on a Kali Linux node, an aggressive dictionary credential attack was directed against the target server user profile. This attack simulated an automated botnet login sequence attempting to harvest a shells footprint.
 
-Command executed from offensive host:
+Command executed from the offensive host:
 hydra -l midhun -P /usr/share/wordlists/rockyou.txt ssh://Victim_IP -t 4 -V
 
 * Command Parameters Decoded:
@@ -61,6 +60,8 @@ index=* sourcetype="linux_secure" "Failed password"
 | stats count by Attacker_IP, Targeted_User
 | rename Attacker_IP as "Attacker IP", Targeted_User as "Targeted Username", count as "Total Failed Attempts"
 
+(Insert your Brute-Force Detection Table screenshot here)
+
 ### 3. Triage & Incident Mapping (Unix Epoch Breakdown)
 Once the bulk attack vectors were validated, finding system compromise events became the primary objective. This query isolated successful authorization triggers:
 index=* sourcetype="linux_secure" "Accepted password"
@@ -75,6 +76,8 @@ index=* sourcetype="linux_secure" "Accepted password"
 | eval Human_Time=strftime(_time, "%Y-%m-%d %H:%M:%S")
 | table Human_Time, Attacker_IP, Targeted_User
 | rename Human_Time as "Timestamp", Attacker_IP as "Attacker IP", Targeted_User as "Compromised Account"
+
+(Insert your Successful Breach Timeline screenshot here)
 
 ---
 
@@ -100,6 +103,8 @@ During active automated intrusions, attackers generate thousands of unique text 
 ## 🏁 Phase 5: Incident Validation & Verification Loop
 
 To rigorously verify the rule's operational status, a secondary attack sequence was executed via Hydra. The scheduled alert executed successfully, tracking the data spike and generating an incident record inside the tracking console.
+
+(Insert your Triggered Alerts Dashboard screenshot here)
 
 ### 🛡️ Analytical Findings & Response Checklist
 1. Malicious Actor Identified: Ingress IP Attacker_IP tracked attempting high-velocity authentication.
