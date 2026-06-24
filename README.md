@@ -21,10 +21,10 @@ To establish a unified monitoring pane, the target Ubuntu host was provisioned w
 
 The secure access tracking infrastructure was configured by creating a dedicated monitor rule in inputs.conf pointing directly to the system's authorization log file:
 
-[monitor:///var/log/auth.log]
-disabled = false
-sourcetype = linux_secure
-index = main
+    [monitor:///var/log/auth.log]
+    disabled = false
+    sourcetype = linux_secure
+    index = main
 
 Following a daemon reload cycle, data synchronization with the Cloud SIEM engine was validated, establishing raw log intake consistency.
 
@@ -35,7 +35,8 @@ Following a daemon reload cycle, data synchronization with the Cloud SIEM engine
 Using a distinct network adapter point on a Kali Linux node, an aggressive dictionary credential attack was directed against the target server user profile. This attack simulated an automated botnet login sequence attempting to harvest a shells footprint.
 
 Command executed from the offensive host:
-hydra -l midhun -P /usr/share/wordlists/rockyou.txt ssh://Victim_IP -t 4 -V
+
+    hydra -l midhun -P /usr/share/wordlists/rockyou.txt ssh://Victim_IP -t 4 -V
 
 * Command Parameters Decoded:
   * -l midhun: Dictates targeting the target account discovered on the destination host.
@@ -51,31 +52,35 @@ During initial log evaluation, the out-of-the-box syslog parser on the default U
 
 ### 1. Ingestion Baseline Discovery Search
 The first step verified that malicious password failure telemetry was actively crossing the network plane into the Splunk indexes:
-index=* sourcetype="linux_secure" "Failed password"
+
+    index=* sourcetype="linux_secure" "Failed password"
 
 ### 2. Regex Token Field Generation & Intrusion Grouping
 Because standard field variables like src_ip or user were unmapped, custom PCRE regular expression extractions were developed inside an inline rex command block. This permitted the extraction of names and target nodes instantly from the _raw text segment, mapping entries into structured statistical tables:
-index=* sourcetype="linux_secure" "Failed password"
-| rex field=_raw "Failed password for (?<Targeted_User>\S+) from (?<Attacker_IP>\S+)"
-| stats count by Attacker_IP, Targeted_User
-| rename Attacker_IP as "Attacker IP", Targeted_User as "Targeted Username", count as "Total Failed Attempts"
+
+    index=* sourcetype="linux_secure" "Failed password"
+    | rex field=_raw "Failed password for (?<Targeted_User>\S+) from (?<Attacker_IP>\S+)"
+    | stats count by Attacker_IP, Targeted_User
+    | rename Attacker_IP as "Attacker IP", Targeted_User as "Targeted Username", count as "Total Failed Attempts"
 
 (Insert your Brute-Force Detection Table screenshot here)
 
 ### 3. Triage & Incident Mapping (Unix Epoch Breakdown)
 Once the bulk attack vectors were validated, finding system compromise events became the primary objective. This query isolated successful authorization triggers:
-index=* sourcetype="linux_secure" "Accepted password"
-| rex field=_raw "Accepted password for (?<Targeted_User>\S+) from (?<Attacker_IP>\S+)"
-| table _time, Attacker_IP, Targeted_User
-| rename _time as "Timestamp", Attacker_IP as "Attacker IP", Targeted_User as "Compromised Account"
+
+    index=* sourcetype="linux_secure" "Accepted password"
+    | rex field=_raw "Accepted password for (?<Targeted_User>\S+) from (?<Attacker_IP>\S+)"
+    | table _time, Attacker_IP, Targeted_User
+    | rename _time as "Timestamp", Attacker_IP as "Attacker IP", Targeted_User as "Compromised Account"
 
 ### 4. Production-Grade Incident Timelining
 To transform raw Unix time integers (e.g., 1782278979.912) into actionable human logs for executive briefing tables, an evaluation filter (eval) coupled with string-formatting elements (strftime) was engineered:
-index=* sourcetype="linux_secure" "Accepted password"
-| rex field=_raw "Accepted password for (?<Targeted_User>\S+) from (?<Attacker_IP>\S+)"
-| eval Human_Time=strftime(_time, "%Y-%m-%d %H:%M:%S")
-| table Human_Time, Attacker_IP, Targeted_User
-| rename Human_Time as "Timestamp", Attacker_IP as "Attacker IP", Targeted_User as "Compromised Account"
+
+    index=* sourcetype="linux_secure" "Accepted password"
+    | rex field=_raw "Accepted password for (?<Targeted_User>\S+) from (?<Attacker_IP>\S+)"
+    | eval Human_Time=strftime(_time, "%Y-%m-%d %H:%M:%S")
+    | table Human_Time, Attacker_IP, Targeted_User
+    | rename Human_Time as "Timestamp", Attacker_IP as "Attacker IP", Targeted_User as "Compromised Account"
 
 (Insert your Successful Breach Timeline screenshot here)
 
