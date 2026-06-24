@@ -63,7 +63,7 @@ Because standard field variables like src_ip or user were unmapped, custom PCRE 
     | stats count by Attacker_IP, Targeted_User
     | rename Attacker_IP as "Attacker IP", Targeted_User as "Targeted Username", count as "Total Failed Attempts"
 
-(Insert your Brute-Force Detection Table screenshot here)
+[Brute-Force Aggregation Table](images/failed_attempts.png)
 
 ### 3. Triage & Incident Mapping (Unix Epoch Breakdown)
 Once the bulk attack vectors were validated, finding system compromise events became the primary objective. This query isolated successful authorization triggers:
